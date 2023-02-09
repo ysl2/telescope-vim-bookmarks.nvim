@@ -37,6 +37,18 @@ local function get_bookmarks(files, opts)
         end
     end
 
+    table.sort(bookmarks, function(a, b)
+      if (not a or not b) or (a.filename == b.filename and a.lnum == b.lnum) then
+        return false
+      end
+      if a.filename ~= b.filename then
+        local f = { a.filename, b.filename }
+        table.sort(f)
+        return (f[1] == a.filename)
+      end
+      return (a.lnum < b.lnum)
+    end)
+
     return bookmarks
 end
 
@@ -94,11 +106,12 @@ end
 
 local function make_bookmark_picker(filenames, opts)
     opts = opts or {}
+    opts = vim.tbl_deep_extend('force', opts, { preview = { hide_on_startup = false } })
 
     local make_finder = function()
         local bookmarks = get_bookmarks(filenames, opts)
 
-        if vim.tbl_isempty(bookmarks) then 
+        if vim.tbl_isempty(bookmarks) then
             print("No bookmarks!")
             return
         end
@@ -108,7 +121,7 @@ local function make_bookmark_picker(filenames, opts)
             entry_maker = make_entry_from_bookmarks(opts),
         }
     end
-    
+
     local initial_finder = make_finder()
     if not initial_finder then return end
 
@@ -118,8 +131,8 @@ local function make_bookmark_picker(filenames, opts)
         previewer = conf.qflist_previewer(opts),
         sorter = conf.generic_sorter(opts),
 
-        attach_mappings = function(prompt_bufnr, map) 
-            local refresh_picker = function() 
+        attach_mappings = function(prompt_bufnr, map)
+            local refresh_picker = function()
                 local new_finder = make_finder()
                 if new_finder then
                     action_state.get_current_picker(prompt_bufnr):refresh(make_finder())
@@ -132,6 +145,9 @@ local function make_bookmark_picker(filenames, opts)
             bookmark_actions.delete_at_cursor:enhance { post = refresh_picker }
             bookmark_actions.delete_all:enhance { post = refresh_picker }
             bookmark_actions.delete_selected_or_at_cursor:enhance { post = refresh_picker }
+
+            map('i', '<C-b>', bookmark_actions.delete_selected_or_at_cursor)
+            map('i', '<A-b>', bookmark_actions.delete_all)
 
             return true
         end
