@@ -29,7 +29,7 @@ local function get_bookmarks(files, opts)
                 table.insert(bookmarks, {
                     filename = file,
                     lnum = tonumber(line),
-                    col=1,
+                    col=bookmark.col_nr,
                     text = text,
                     sign_idx = bookmark.sign_idx,
                 })
@@ -98,7 +98,7 @@ local function make_entry_from_bookmarks(opts)
 
             filename = entry.filename,
             lnum = entry.lnum,
-            col = 1,
+            col = entry.col,
             text = entry.text,
         }
     end
