@@ -15,7 +15,7 @@ return transform_mod {
     end,
 
     delete_all = function(prompt_bufnr)
-        vim.cmd('BookmarkClearAll')
+        vim.cmd('silent! BookmarkClearAll')
     end
 }
 
