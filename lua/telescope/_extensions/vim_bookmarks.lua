@@ -143,8 +143,8 @@ local function make_bookmark_picker(filenames, opts)
 
             bookmark_actions.delete_all:enhance { post = refresh_picker }
 
-            map('i', '<C-b>', bookmark_actions.delete)
-            map('i', '<A-b>', bookmark_actions.delete_all)
+            map('i', '<C-x>', bookmark_actions.delete)
+            map('i', '<A-x>', bookmark_actions.delete_all)
 
             return true
         end
